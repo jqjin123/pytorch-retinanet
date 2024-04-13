@@ -101,7 +101,7 @@ class RegressionModel(nn.Module):
         # out is B x C x W x H, with C = 4*num_anchors
         out = out.permute(0, 2, 3, 1)
 
-        return out.contiguous().view(out.shape[0], -1, 4)
+        return out.contiguous().view(out.shape[0], -1, 4)  # 最终的维度为(batch_size, feat_w*feat_h*9, 4)
 
 
 class ClassificationModel(nn.Module):
@@ -149,7 +149,7 @@ class ClassificationModel(nn.Module):
 
         out2 = out1.view(batch_size, width, height, self.num_anchors, self.num_classes)
 
-        return out2.contiguous().view(x.shape[0], -1, self.num_classes)
+        return out2.contiguous().view(x.shape[0], -1, self.num_classes)  # 最终的维度为(batch_size, feat_w*feat_h*9, num_classes)
 
 
 class ResNet(nn.Module):
@@ -177,7 +177,7 @@ class ResNet(nn.Module):
 
         self.fpn = PyramidFeatures(fpn_sizes[0], fpn_sizes[1], fpn_sizes[2])
 
-        self.regressionModel = RegressionModel(256)
+        self.regressionModel = RegressionModel(256)  # 所有特征图的通道数最后都会统一为256, 从而保证能够共享同一个分类头和回归头
         self.classificationModel = ClassificationModel(256, num_classes=num_classes)
 
         self.anchors = Anchors()
